@@ -3,6 +3,8 @@ import argparse
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from prompts import system_prompt
+from functions.get_files_info import available_functions
 
 
 load_dotenv()
@@ -20,14 +22,24 @@ def main():
     messages = [types.Content(role="user", parts=[types.Part(text=args.prompt)])]
     res = client.models.generate_content(
         model=model,
-        contents=messages
+        contents=messages,
+        config=types.GenerateContentConfig(
+            tools=[available_functions],
+            system_instruction=system_prompt,
+        )
     )
     metadata = res.usage_metadata
     if args.verbose:
         print(f"User prompt: {messages[0].parts[0].text}")
         print(f"Prompt tokens: {metadata.prompt_token_count}")
         print(f"Response tokens: {metadata.candidates_token_count}")
-    print(res.text)
+    
+    if res.function_calls is not None:
+        for function_call in res.function_calls:
+            print(f"Calling function: {function_call.name}({function_call.args}")
+    else:
+        print(res.text)
+        
 
 
 if __name__ == "__main__":
