@@ -21,7 +21,7 @@ def get_file_content(working_directory, file_path):
 
 schema_get_file_content = types.FunctionDeclaration(
     name="get_file_content",
-    description="Outputs the contents of a file, truncated to 10,000 characters",
+    description="Read the contents of a file, truncated to 10,000 characters",
     parameters=types.Schema(
         type=types.Type.OBJECT,
         properties={
